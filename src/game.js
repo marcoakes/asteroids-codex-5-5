@@ -1067,26 +1067,23 @@
       ctx.fillText('That is the right direction if the goal is to beat Claude.', rightX + 16, shellY + shellH - 62);
     }
 
-    ctx.textAlign = compact ? 'left' : 'center';
-    if (!compact && best > 0) {
+    ctx.textAlign = 'left';
+    var footerX = compact ? leftX : leftX;
+    var footerPromptY = shellY + shellH - (compact ? 28 : 40);
+    var footerBestY = footerPromptY - 34;
+    if (best > 0) {
       ctx.fillStyle = '#fd8';
       ctx.font = 'bold 12px "SF Mono", monospace';
-      ctx.fillText('BEST  ' + best, cx, shellY + shellH - 62);
+      ctx.fillText('BEST  ' + best, footerX, footerBestY);
     }
     ctx.globalAlpha = pulse;
     ctx.shadowBlur = 18;
     ctx.shadowColor = '#ffd86a';
     ctx.fillStyle = '#ffd86a';
     ctx.font = 'bold 18px "SF Mono", monospace';
-    ctx.fillText('PRESS FIRE, THRUST, OR TAP TO ENGAGE', compact ? leftX : cx, shellY + shellH - 26);
+    ctx.fillText('PRESS FIRE, THRUST, OR TAP TO ENGAGE', footerX, footerPromptY);
     ctx.globalAlpha = 1;
     ctx.shadowBlur = 0;
-
-    if (compact && best > 0) {
-      ctx.fillStyle = '#fd8';
-      ctx.font = 'bold 12px "SF Mono", monospace';
-      ctx.fillText('BEST  ' + best, compact ? leftX : cx, shellY + shellH - 48);
-    }
     ctx.restore();
   }
 
