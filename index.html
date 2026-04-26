@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#04111f">
+<title>Asteroids Codex 5.5</title>
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+<canvas id="game" aria-label="Asteroids Codex 5.5"></canvas>
+
+<div class="hud-shell">
+  <div class="brand">
+    <div class="brand-kicker">Codex 5.5 Simulation</div>
+    <div class="brand-title">Asteroids</div>
+  </div>
+
+  <div class="touch-ui" aria-hidden="true">
+    <div class="stick-wrap">
+      <button class="touch-btn touch-wide" data-key="left">Turn Left</button>
+      <button class="touch-btn touch-wide" data-key="right">Turn Right</button>
+      <button class="touch-btn touch-thrust" data-key="up">Thrust</button>
+    </div>
+    <div class="action-wrap">
+      <button class="touch-btn touch-fire" data-key="fire">Fire</button>
+      <button class="touch-btn touch-alt" data-key="boost">Overdrive</button>
+      <button class="touch-btn touch-alt" data-key="warp">Warp</button>
+    </div>
+  </div>
+</div>
+
+<script src="./src/game.js" defer></script>
+</body>
+</html>
