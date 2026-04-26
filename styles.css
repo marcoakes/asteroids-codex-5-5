@@ -58,6 +58,8 @@ canvas {
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.28);
   backdrop-filter: blur(14px);
   opacity: 0.9;
+  transform: translateY(0);
+  transition: opacity 180ms ease, transform 180ms ease;
 }
 
 .brand-kicker {
@@ -82,6 +84,11 @@ canvas {
   height: 2px;
   border-radius: 999px;
   background: linear-gradient(90deg, rgba(108, 243, 255, 0), rgba(108, 243, 255, 0.95), rgba(255, 207, 116, 0));
+}
+
+body[data-state="menu"] .brand {
+  opacity: 0;
+  transform: translateY(-10px);
 }
 
 .touch-ui {

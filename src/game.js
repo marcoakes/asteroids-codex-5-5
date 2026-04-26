@@ -1,6 +1,7 @@
 (function () {
   'use strict';
 
+  document.body.setAttribute('data-state', 'menu');
   var canvas = document.getElementById('game');
   var touchButtons = Array.prototype.slice.call(document.querySelectorAll('[data-key]'));
   var ctx = canvas.getContext('2d');
@@ -21,6 +22,7 @@
   function randi(a, b) { return Math.floor(rand(a, b)); }
   function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
   function wrap(v, m) { return ((v % m) + m) % m; }
+  function lerp(a, b, t) { return a + (b - a) * t; }
   function wrapDist2(ax, ay, bx, by) {
     var dx = Math.abs(ax - bx); if (dx > W / 2) dx = W - dx;
     var dy = Math.abs(ay - by); if (dy > H / 2) dy = H - dy;
@@ -567,6 +569,7 @@
 
   // ---------- Render ----------
   function render() {
+    document.body.setAttribute('data-state', state);
     var sky = ctx.createLinearGradient(0, 0, 0, H);
     sky.addColorStop(0, focus.active > 0 ? '#071d28' : '#03040a');
     sky.addColorStop(1, focus.active > 0 ? '#041019' : '#06111b');
@@ -829,72 +832,251 @@
     ctx.shadowBlur = 0;
   }
 
+  function roundRect(x, y, w, h, r) {
+    var rr = Math.min(r, w * 0.5, h * 0.5);
+    ctx.beginPath();
+    ctx.moveTo(x + rr, y);
+    ctx.arcTo(x + w, y, x + w, y + h, rr);
+    ctx.arcTo(x + w, y + h, x, y + h, rr);
+    ctx.arcTo(x, y + h, x, y, rr);
+    ctx.arcTo(x, y, x + w, y, rr);
+    ctx.closePath();
+  }
+
+  function drawMenuStat(x, y, w, h, label, value, tone) {
+    ctx.save();
+    ctx.fillStyle = 'rgba(7, 19, 31, 0.72)';
+    ctx.strokeStyle = tone;
+    ctx.lineWidth = 1;
+    roundRect(x, y, w, h, 14);
+    ctx.fill();
+    ctx.globalAlpha = 0.28;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+    ctx.textAlign = 'left';
+    ctx.fillStyle = 'rgba(190,220,238,0.72)';
+    ctx.font = 'bold 10px "SF Mono", monospace';
+    ctx.fillText(label, x + 14, y + 12);
+    ctx.fillStyle = tone;
+    ctx.font = 'bold 18px "SF Mono", monospace';
+    ctx.fillText(value, x + 14, y + 34);
+    ctx.restore();
+  }
+
+  function drawMenuShipPreview(x, y, scale) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(scale, scale);
+    ctx.rotate(-Math.PI / 2 + Math.sin(introDrift * 0.75) * 0.08);
+
+    ctx.strokeStyle = '#7ef';
+    ctx.fillStyle = 'rgba(18, 96, 148, 0.88)';
+    ctx.lineWidth = 3;
+    ctx.shadowBlur = 20;
+    ctx.shadowColor = '#6ff';
+    ctx.beginPath();
+    ctx.moveTo(42, 0);
+    ctx.lineTo(-26, -24);
+    ctx.lineTo(-8, 0);
+    ctx.lineTo(-26, 24);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.strokeStyle = 'rgba(255, 207, 116, 0.9)';
+    ctx.shadowColor = '#ffb14a';
+    ctx.beginPath();
+    ctx.moveTo(-10, -7);
+    ctx.lineTo(-44 - Math.sin(introDrift * 6) * 10, 0);
+    ctx.lineTo(-10, 7);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawMenuShard(x, y, angle, scale) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(angle);
+    ctx.scale(scale, scale);
+    ctx.strokeStyle = 'rgba(168,196,220,0.9)';
+    ctx.fillStyle = 'rgba(18,26,42,0.82)';
+    ctx.lineWidth = 1.8;
+    ctx.shadowBlur = 8;
+    ctx.shadowColor = 'rgba(120,180,240,0.28)';
+    ctx.beginPath();
+    ctx.moveTo(20, -2);
+    ctx.lineTo(8, -16);
+    ctx.lineTo(-14, -10);
+    ctx.lineTo(-20, 6);
+    ctx.lineTo(-2, 18);
+    ctx.lineTo(16, 12);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+  }
+
   function drawMenu() {
     ctx.save();
-    // Dim bg slightly so ship+stars still peek through
-    ctx.fillStyle = 'rgba(0,5,15,0.55)';
+    ctx.fillStyle = 'rgba(0,5,15,0.48)';
     ctx.fillRect(0, 0, W, H);
 
     var cx = W / 2, cy = H / 2;
     var pulse = 0.55 + Math.sin(performance.now() * 0.005) * 0.45;
-    panel(cx - 300, cy - 196, 600, 392);
+    var compact = W < 920;
+    var shellW = compact ? Math.min(W - 36, 620) : Math.min(W - 64, 1080);
+    var shellH = compact ? Math.min(H - 100, 540) : Math.min(H - 100, 520);
+    var shellX = cx - shellW / 2;
+    var shellY = cy - shellH / 2;
+    var leftW = compact ? shellW - 48 : shellW * 0.54;
+    var rightW = compact ? shellW - 48 : shellW * 0.32;
+    var leftX = shellX + 26;
+    var leftY = shellY + 28;
+    var rightX = compact ? shellX + 26 : shellX + shellW - rightW - 26;
+    var rightY = compact ? shellY + 268 : shellY + 34;
 
-    ctx.strokeStyle = 'rgba(108,243,255,0.18)';
+    var wash = ctx.createRadialGradient(cx, cy, 40, cx, cy, shellW * 0.7);
+    wash.addColorStop(0, 'rgba(31, 122, 184, 0.12)');
+    wash.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = wash;
+    ctx.fillRect(0, 0, W, H);
+
+    panel(shellX, shellY, shellW, shellH);
+
+    ctx.strokeStyle = 'rgba(108,243,255,0.16)';
     ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(cx - 240, cy - 122);
-    ctx.lineTo(cx + 240, cy - 122);
-    ctx.moveTo(cx - 240, cy + 78);
-    ctx.lineTo(cx + 240, cy + 78);
-    ctx.stroke();
+    if (!compact) {
+      ctx.beginPath();
+      ctx.moveTo(shellX + shellW * 0.6, shellY + 30);
+      ctx.lineTo(shellX + shellW * 0.6, shellY + shellH - 30);
+      ctx.stroke();
+    }
 
-    ctx.textAlign = 'center';
-    ctx.font = 'bold 15px "SF Mono", monospace';
+    ctx.textAlign = 'left';
     ctx.shadowBlur = 0;
     ctx.fillStyle = '#7ef';
-    ctx.fillText('NEURAL ARCADE PROTOCOL', cx, cy - 140);
-    ctx.font = 'bold 56px "SF Mono", monospace';
-    ctx.shadowBlur = 22; ctx.shadowColor = '#6ff';
-    ctx.fillStyle = '#cff';
-    ctx.fillText('ASTEROIDS', cx, cy - 88 + Math.sin(introDrift * 1.4) * 2);
-
     ctx.font = 'bold 12px "SF Mono", monospace';
-    ctx.shadowBlur = 10; ctx.shadowColor = '#9af';
-    ctx.fillStyle = '#9cf';
-    ctx.fillText('CODEX  ·  5.5  ·  ADAPTIVE COMBAT BUILD', cx, cy - 52);
+    ctx.fillText('CODEX 5.5 // LIVE COMBAT BUILD', leftX, leftY);
 
-    ctx.font = '15px "SF Mono", monospace';
+    ctx.fillStyle = '#e8fbff';
+    ctx.shadowBlur = 24;
+    ctx.shadowColor = '#6ff';
+    ctx.font = compact ? 'bold 46px "SF Mono", monospace' : 'bold 68px "SF Mono", monospace';
+    ctx.fillText('ASTEROIDS', leftX, leftY + 62);
+    ctx.fillStyle = '#9cdfff';
+    ctx.font = compact ? 'bold 20px "SF Mono", monospace' : 'bold 24px "SF Mono", monospace';
+    ctx.fillText('REWRITTEN TO HIT HARDER', leftX, leftY + 96);
+
     ctx.shadowBlur = 0;
-    ctx.fillStyle = '#bcd';
-    var lines = [
-      'ADAPTIVE DIRECTOR  ·  OVERDRIVE BURSTS  ·  TOUCH FLIGHT CONTROLS',
-      'ROTATE      ← →   /  A D',
-      'THRUST      ↑     /  W',
-      'FIRE        SPACE',
-      'OVERDRIVE   ENTER',
-      'HYPERSPACE  SHIFT /  H',
-      'PAUSE       P     /  ESC'
-    ];
-    for (var i = 0; i < lines.length; i++) ctx.fillText(lines[i], cx, cy - 6 + i * 24);
+    ctx.fillStyle = 'rgba(214, 232, 244, 0.88)';
+    ctx.font = compact ? '15px "SF Mono", monospace' : '16px "SF Mono", monospace';
+    var blurb = compact
+      ? [
+        'Adaptive waves, close-range focus building, and short',
+        'overdrive spikes. This version should feel meaner, cleaner,',
+        'and more deliberate than the Claude build.'
+      ]
+      : [
+        'Adaptive waves, close-range focus building, and short overdrive spikes.',
+        'Built to feel meaner, cleaner, and more authored than the Claude build.'
+      ];
+    for (var b = 0; b < blurb.length; b++) ctx.fillText(blurb[b], leftX, leftY + 142 + b * 24);
 
-    ctx.font = 'bold 13px "SF Mono", monospace';
+    var statY = leftY + (compact ? 238 : 220);
+    var statW = compact ? shellW - 84 : Math.min(164, (leftW - 18) / 3);
+    if (compact) {
+      drawMenuStat(leftX, statY, statW, 50, 'DIRECTOR', director.label.toUpperCase(), '#ffcf74');
+      drawMenuStat(leftX, statY + 58, statW, 50, 'OVERDRIVE', 'FOCUS-TRIGGERED', '#80ffe8');
+      drawMenuStat(leftX, statY + 116, statW, 50, 'DEPLOYMENT', 'PAGES READY', '#7ef');
+    } else {
+      drawMenuStat(leftX, statY, statW, 50, 'DIRECTOR', director.label.toUpperCase(), '#ffcf74');
+      drawMenuStat(leftX + statW + 10, statY, statW, 50, 'OVERDRIVE', 'FOCUS-TRIGGERED', '#80ffe8');
+      drawMenuStat(leftX + (statW + 10) * 2, statY, statW, 50, 'DEPLOYMENT', 'PAGES READY', '#7ef');
+    }
+
+    var chipY = statY + (compact ? 190 : 76);
+    ctx.fillStyle = 'rgba(130, 230, 255, 0.18)';
+    roundRect(leftX, chipY, compact ? shellW - 84 : leftW - 20, compact ? 126 : 110, 18);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(108,243,255,0.22)';
+    ctx.stroke();
+
     ctx.fillStyle = '#80ffe8';
-    ctx.fillText('DIRECTOR STATE: ' + director.label.toUpperCase(), cx, cy + 98);
-    ctx.fillStyle = '#ffd86a';
-    ctx.fillText('BUILD FOCUS BY PLAYING CLOSE, CHAINING KILLS, AND GRABBING PICKUPS', cx, cy + 120);
+    ctx.font = 'bold 12px "SF Mono", monospace';
+    ctx.fillText('FLIGHT SYSTEMS', leftX + 16, chipY + 18);
+    ctx.fillStyle = '#d8edf8';
+    ctx.font = compact ? '13px "SF Mono", monospace' : '14px "SF Mono", monospace';
+    var controlLines = compact
+      ? [
+        'TURN  A/D OR ARROWS   FIRE  SPACE   BOOST  ENTER',
+        'THRUST  W OR UP       WARP  SHIFT   PAUSE  P/ESC'
+      ]
+      : [
+        'TURN  A/D OR ARROWS',
+        'THRUST  W OR UP',
+        'FIRE  SPACE',
+        'BOOST  ENTER',
+        'WARP  SHIFT',
+        'PAUSE  P/ESC'
+      ];
+    for (var cl = 0; cl < controlLines.length; cl++) {
+      var row = compact ? 0 : Math.floor(cl / 3);
+      var col = compact ? cl : cl % 3;
+      var tx = leftX + 16 + (compact ? 0 : col * 155);
+      var ty = chipY + 44 + (compact ? cl * 24 : row * 28);
+      ctx.fillText(controlLines[cl], tx, ty);
+    }
 
-    // Pulse prompt
+    if (!compact) {
+      var previewCx = rightX + rightW * 0.5;
+      var previewCy = rightY + 122;
+      ctx.save();
+      ctx.strokeStyle = 'rgba(108,243,255,0.14)';
+      ctx.lineWidth = 1;
+      for (var ring = 0; ring < 4; ring++) {
+        ctx.beginPath();
+        ctx.arc(previewCx, previewCy, 48 + ring * 28, 0, TAU);
+        ctx.stroke();
+      }
+      ctx.restore();
+      drawMenuShipPreview(previewCx, previewCy, 1.45);
+
+      for (var deco = 0; deco < 3; deco++) {
+        var ang = introDrift * (0.35 + deco * 0.12) + deco * 2;
+        var rx = previewCx + Math.cos(ang) * (104 + deco * 26);
+        var ry = previewCy + Math.sin(ang) * (70 + deco * 18);
+        drawMenuShard(rx, ry, ang, 0.75 - deco * 0.12);
+      }
+
+      ctx.fillStyle = 'rgba(130, 230, 255, 0.16)';
+      roundRect(rightX, shellY + shellH - 168, rightW, 132, 22);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(108,243,255,0.2)';
+      ctx.stroke();
+      ctx.fillStyle = '#7ef';
+      ctx.font = 'bold 12px "SF Mono", monospace';
+      ctx.fillText('WHY THIS VERSION STANDS OUT', rightX + 16, shellY + shellH - 146);
+      ctx.fillStyle = '#d8edf8';
+      ctx.font = '14px "SF Mono", monospace';
+      ctx.fillText('Fewer words. Stronger silhouette. Clear system identity.', rightX + 16, shellY + shellH - 114);
+      ctx.fillText('The menu now sells speed, threat, and intent before launch.', rightX + 16, shellY + shellH - 88);
+      ctx.fillText('That is the right direction if the goal is to beat Claude.', rightX + 16, shellY + shellH - 62);
+    }
+
+    ctx.textAlign = compact ? 'left' : 'center';
     ctx.globalAlpha = pulse;
-    ctx.shadowBlur = 14; ctx.shadowColor = '#ffd86a';
+    ctx.shadowBlur = 18;
+    ctx.shadowColor = '#ffd86a';
     ctx.fillStyle = '#ffd86a';
     ctx.font = 'bold 18px "SF Mono", monospace';
-    ctx.fillText('PRESS FIRE, THRUST, OR TAP TO ENGAGE', cx, cy + 158);
-    ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+    ctx.fillText('PRESS FIRE, THRUST, OR TAP TO ENGAGE', compact ? leftX : cx, shellY + shellH - 26);
+    ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
 
     if (best > 0) {
-      ctx.font = '12px "SF Mono", monospace';
       ctx.fillStyle = '#fd8';
-      ctx.fillText('BEST  ' + best, cx, cy + 182);
+      ctx.font = 'bold 12px "SF Mono", monospace';
+      ctx.fillText('BEST  ' + best, compact ? leftX : cx, shellY + shellH - 48);
     }
     ctx.restore();
   }
