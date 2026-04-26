@@ -984,10 +984,10 @@
     var blurb = compact
       ? [
         'Adaptive waves, close-range focus building,',
-        'and short overdrive spikes.'
+        'and short overdrive bursts.'
       ]
       : [
-        'Adaptive waves, close-range focus building, and short overdrive spikes.',
+        'Adaptive waves, focus building, and short overdrive bursts.',
         'Sharper, cleaner, and more deliberate from the first launch.'
       ];
     for (var b = 0; b < blurb.length; b++) ctx.fillText(blurb[b], leftX, leftY + 148 + b * 24);
