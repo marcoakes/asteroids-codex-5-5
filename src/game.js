@@ -860,7 +860,7 @@
     ctx.shadowBlur = 14; ctx.shadowColor = '#ffd86a';
     ctx.fillStyle = '#ffd86a';
     ctx.font = 'bold 18px "SF Mono", monospace';
-    ctx.fillText('PRESS ANY KEY OR TAP TO ENGAGE', cx, cy + 132);
+    ctx.fillText('PRESS FIRE, THRUST, OR TAP TO ENGAGE', cx, cy + 132);
     ctx.globalAlpha = 1; ctx.shadowBlur = 0;
 
     if (best > 0) {
@@ -913,7 +913,7 @@
     ctx.shadowBlur = 14; ctx.shadowColor = '#6ff';
     ctx.fillStyle = '#cff';
     ctx.font = 'bold 16px "SF Mono", monospace';
-    ctx.fillText('PRESS ANY KEY TO RELAUNCH', cx, cy + 90);
+    ctx.fillText('PRESS FIRE OR TAP TO RELAUNCH', cx, cy + 90);
     ctx.globalAlpha = 1;
     ctx.restore();
   }

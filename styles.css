@@ -50,7 +50,7 @@ canvas {
 .brand {
   position: absolute;
   top: 20px;
-  left: 20px;
+  right: 20px;
   padding: 12px 14px;
   border: 1px solid var(--panel-border);
   border-radius: 16px;
@@ -140,7 +140,7 @@ canvas {
 
   .brand {
     top: 14px;
-    left: 14px;
+    right: 14px;
     padding: 10px 12px;
   }
 }
