@@ -869,8 +869,8 @@
     ctx.font = 'bold 10px "SF Mono", monospace';
     ctx.fillText(label, x + 14, y + 12);
     ctx.fillStyle = tone;
-    ctx.font = 'bold 18px "SF Mono", monospace';
-    ctx.fillText(value, x + 14, y + 34);
+    ctx.font = 'bold 16px "SF Mono", monospace';
+    ctx.fillText(value, x + 14, y + 33);
     ctx.restore();
   }
 
@@ -983,29 +983,26 @@
     ctx.font = compact ? '15px "SF Mono", monospace' : '16px "SF Mono", monospace';
     var blurb = compact
       ? [
-        'Adaptive waves, close-range focus building, and short',
-        'overdrive spikes. Cleaner, sharper, and more deliberate',
-        'from the first launch.'
+        'Adaptive waves, close-range focus building,',
+        'and short overdrive spikes.'
       ]
       : [
         'Adaptive waves, close-range focus building, and short overdrive spikes.',
-        'Built to feel sharper, cleaner, and more deliberate from the first launch.'
+        'Sharper, cleaner, and more deliberate from the first launch.'
       ];
     for (var b = 0; b < blurb.length; b++) ctx.fillText(blurb[b], leftX, leftY + 148 + b * 24);
 
     var statY = leftY + (compact ? 252 : 232);
-    var statW = compact ? shellW - 84 : Math.min(156, (leftW - 18) / 3);
+    var statW = compact ? shellW - 84 : Math.floor((leftW - 30) / 2);
     if (compact) {
       drawMenuStat(leftX, statY, statW, 50, 'DIRECTOR', director.label.toUpperCase(), '#ffcf74');
-      drawMenuStat(leftX, statY + 58, statW, 50, 'OVERDRIVE', 'FOCUS-TRIGGERED', '#80ffe8');
-      drawMenuStat(leftX, statY + 116, statW, 50, 'DEPLOYMENT', 'PAGES READY', '#7ef');
+      drawMenuStat(leftX, statY + 58, statW, 50, 'OVERDRIVE', 'FOCUS BURST', '#80ffe8');
     } else {
       drawMenuStat(leftX, statY, statW, 50, 'DIRECTOR', director.label.toUpperCase(), '#ffcf74');
-      drawMenuStat(leftX + statW + 10, statY, statW, 50, 'OVERDRIVE', 'FOCUS-TRIGGERED', '#80ffe8');
-      drawMenuStat(leftX + (statW + 10) * 2, statY, statW, 50, 'DEPLOYMENT', 'PAGES READY', '#7ef');
+      drawMenuStat(leftX + statW + 14, statY, statW, 50, 'OVERDRIVE', 'FOCUS BURST', '#80ffe8');
     }
 
-    var chipY = statY + (compact ? 190 : 84);
+    var chipY = statY + (compact ? 132 : 84);
     ctx.fillStyle = 'rgba(130, 230, 255, 0.18)';
     roundRect(leftX, chipY, compact ? shellW - 84 : leftW - 20, compact ? 126 : 156, 18);
     ctx.fill();
@@ -1019,16 +1016,16 @@
     ctx.font = compact ? '13px "SF Mono", monospace' : '14px "SF Mono", monospace';
     var controlLines = compact
       ? [
-        'TURN  A/D OR ARROWS',
-        'THRUST  W OR UP',
+        'TURN  A/D OR ←→',
+        'THRUST  W OR ↑',
         'FIRE  SPACE',
         'BOOST  ENTER',
         'WARP  SHIFT',
         'PAUSE  P/ESC'
       ]
       : [
-        'TURN  A/D OR ARROWS',
-        'THRUST  W OR UP',
+        'TURN  A/D OR ←→',
+        'THRUST  W OR ↑',
         'FIRE  SPACE',
         'BOOST  ENTER',
         'WARP  SHIFT',
