@@ -152,10 +152,10 @@
     director.label = MODE_LABELS[idx];
   }
 
-  function chargeFocus(amount, x, y) {
+  function chargeFocus(amount, x, y, showText) {
     if (focus.active > 0) return;
     focus.charge = clamp(focus.charge + amount, 0, focus.max);
-    if (x !== undefined && y !== undefined && amount >= 6) {
+    if (showText && x !== undefined && y !== undefined && amount >= 6) {
       floats.push({ x: x, y: y, t: 0, text: '+FOCUS', color: '#80ffe8' });
     }
   }
@@ -236,7 +236,7 @@
     sfxPower();
     if (p.type === 'life') { lives++; }
     else { POW[p.type].t = POW[p.type].max; }
-    chargeFocus(8, p.x, p.y);
+    chargeFocus(8, p.x, p.y, true);
   }
 
   function newGame() {
@@ -460,7 +460,7 @@
           addScore(pts, rk.x, rk.y, '#fff');
           breakRock(rk); rocks.splice(rr, 1);
           kills++; sfxBoom(); shake = Math.max(shake, rk.size * 3);
-          chargeFocus(rk.size === 3 ? 6 : rk.size === 2 ? 8 : 10, rk.x, rk.y);
+          chargeFocus(rk.size === 3 ? 6 : rk.size === 2 ? 8 : 10);
           if (!b.pierce) hit = true; else b.pierce--;
           updateDirector();
           break;
@@ -476,7 +476,7 @@
             particles.push({ x: uf2.x, y: uf2.y, vx: Math.cos(aa) * ss, vy: Math.sin(aa) * ss, life: rand(0.4, 0.9), max: 0.9, color: uf2.color, r: rand(1.2, 2.5) });
           }
           ufos.splice(uu, 1); kills++; shake = Math.max(shake, 10); sfxBoom();
-          chargeFocus(18, uf2.x, uf2.y);
+          chargeFocus(18);
           if (Math.random() < 0.35) spawnPickup(uf2.x, uf2.y);
           bullets.splice(bi, 1); hit = true; break;
         }
