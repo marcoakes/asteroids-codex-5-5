@@ -57,6 +57,7 @@ canvas {
   background: linear-gradient(180deg, rgba(6, 17, 28, 0.78), rgba(6, 17, 28, 0.48));
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.28);
   backdrop-filter: blur(14px);
+  opacity: 0.9;
 }
 
 .brand-kicker {
@@ -72,6 +73,15 @@ canvas {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+.brand::after {
+  content: "";
+  position: absolute;
+  inset: auto 14px 0;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(108, 243, 255, 0), rgba(108, 243, 255, 0.95), rgba(255, 207, 116, 0));
 }
 
 .touch-ui {
@@ -142,6 +152,7 @@ canvas {
     top: 14px;
     right: 14px;
     padding: 10px 12px;
+    opacity: 0.78;
   }
 }
 

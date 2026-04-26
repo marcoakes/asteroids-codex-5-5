@@ -121,6 +121,7 @@
   var score = 0, best = 0, wave = 0, lives = 3, kills = 0, combo = 0, comboT = 0;
   var shake = 0, flash = 0, waveT = 0, nextUfo = 0, respawnT = 0, deathT = 0;
   var pulseText = '', pulseT = 0;
+  var introDrift = 0;
   var focus = { charge: 0, max: 100, active: 0, cooldown: 0 };
   var director = { heat: 0.18, label: 'Calculating' };
   try { best = parseInt(localStorage.getItem('ac55_best') || localStorage.getItem('ao47b') || '0', 10) || 0; } catch (e) {}
@@ -251,11 +252,12 @@
   function startWave() {
     wave++;
     updateDirector();
-    var extra = director.heat > 0.7 ? 2 : director.heat > 0.45 ? 1 : 0;
-    var count = Math.min(4 + Math.floor(wave * 0.7) + extra, 14);
+    var extra = director.heat > 0.78 ? 2 : director.heat > 0.52 ? 1 : 0;
+    var baseCount = wave === 1 ? 3 : 4 + Math.floor(wave * 0.65);
+    var count = Math.min(baseCount + extra, 14);
     for (var i = 0; i < count; i++) spawnRock(3);
-    if (wave > 5) for (var j = 0; j < Math.floor(wave / 3) + extra; j++) spawnRock(2);
-    waveT = 0; nextUfo = Math.max(8, 20 - wave - Math.floor(director.heat * 4));
+    if (wave > 5) for (var j = 0; j < Math.floor(wave / 3) + (extra > 0 ? 1 : 0); j++) spawnRock(2);
+    waveT = 0; nextUfo = wave < 3 ? 18 - wave : Math.max(8, 20 - wave - Math.floor(director.heat * 4));
     pulseText = 'WAVE ' + wave + ' · ' + director.label.toUpperCase();
     pulseT = 1.3;
     chargeFocus(12);
@@ -328,6 +330,7 @@
 
   // ---------- Update ----------
   function update(dt) {
+    introDrift += dt;
     // Menu state: wait for any key/click
     if (state === 'menu') {
       if (pressed['any'] || pressed['fire'] || pressed['up'] || pressed['w'] || pressed['left'] || pressed['right'] || pressed['boost']) {
@@ -781,12 +784,18 @@
     ctx.textAlign = 'right';
     ctx.fillStyle = '#ffd86a'; ctx.shadowColor = '#ffd86a';
     ctx.fillText('DIRECTOR ' + director.label.toUpperCase(), W - 24, 76);
+    ctx.fillStyle = 'rgba(255, 216, 122, 0.16)';
+    ctx.fillRect(W - 194, 98, 170, 10);
+    ctx.fillStyle = director.heat > 0.72 ? '#ff8d7a' : director.heat > 0.45 ? '#ffd86a' : '#7ef';
+    ctx.fillRect(W - 194, 98, 170 * director.heat, 10);
+    ctx.strokeStyle = 'rgba(255,216,122,0.28)';
+    ctx.strokeRect(W - 194, 98, 170, 10);
     if (focus.active > 0) {
       ctx.fillStyle = '#80ffe8'; ctx.shadowColor = '#80ffe8';
-      ctx.fillText('OVERDRIVE ' + focus.active.toFixed(1) + 's', W - 24, 96);
+      ctx.fillText('OVERDRIVE ' + focus.active.toFixed(1) + 's', W - 24, 118);
     } else if (focus.cooldown > 0) {
       ctx.fillStyle = 'rgba(190,230,245,0.8)'; ctx.shadowColor = '#6ff';
-      ctx.fillText('RECHARGE ' + focus.cooldown.toFixed(1) + 's', W - 24, 96);
+      ctx.fillText('RECHARGE ' + focus.cooldown.toFixed(1) + 's', W - 24, 118);
     }
 
     // Controls hint
@@ -827,24 +836,38 @@
     ctx.fillRect(0, 0, W, H);
 
     var cx = W / 2, cy = H / 2;
-    panel(cx - 280, cy - 180, 560, 360);
+    var pulse = 0.55 + Math.sin(performance.now() * 0.005) * 0.45;
+    panel(cx - 300, cy - 196, 600, 392);
+
+    ctx.strokeStyle = 'rgba(108,243,255,0.18)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(cx - 240, cy - 122);
+    ctx.lineTo(cx + 240, cy - 122);
+    ctx.moveTo(cx - 240, cy + 78);
+    ctx.lineTo(cx + 240, cy + 78);
+    ctx.stroke();
 
     ctx.textAlign = 'center';
-    ctx.font = 'bold 48px "SF Mono", monospace';
+    ctx.font = 'bold 15px "SF Mono", monospace';
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#7ef';
+    ctx.fillText('NEURAL ARCADE PROTOCOL', cx, cy - 140);
+    ctx.font = 'bold 56px "SF Mono", monospace';
     ctx.shadowBlur = 22; ctx.shadowColor = '#6ff';
     ctx.fillStyle = '#cff';
-    ctx.fillText('ASTEROIDS', cx, cy - 102);
+    ctx.fillText('ASTEROIDS', cx, cy - 88 + Math.sin(introDrift * 1.4) * 2);
 
     ctx.font = 'bold 12px "SF Mono", monospace';
     ctx.shadowBlur = 10; ctx.shadowColor = '#9af';
     ctx.fillStyle = '#9cf';
-    ctx.fillText('CODEX  ·  5.5', cx, cy - 72);
+    ctx.fillText('CODEX  ·  5.5  ·  ADAPTIVE COMBAT BUILD', cx, cy - 52);
 
     ctx.font = '15px "SF Mono", monospace';
     ctx.shadowBlur = 0;
     ctx.fillStyle = '#bcd';
     var lines = [
-      'ADAPTIVE DIRECTOR  ·  OVERDRIVE SYSTEM  ·  TOUCH FLIGHT CONTROLS',
+      'ADAPTIVE DIRECTOR  ·  OVERDRIVE BURSTS  ·  TOUCH FLIGHT CONTROLS',
       'ROTATE      ← →   /  A D',
       'THRUST      ↑     /  W',
       'FIRE        SPACE',
@@ -852,21 +875,26 @@
       'HYPERSPACE  SHIFT /  H',
       'PAUSE       P     /  ESC'
     ];
-    for (var i = 0; i < lines.length; i++) ctx.fillText(lines[i], cx, cy - 28 + i * 24);
+    for (var i = 0; i < lines.length; i++) ctx.fillText(lines[i], cx, cy - 6 + i * 24);
+
+    ctx.font = 'bold 13px "SF Mono", monospace';
+    ctx.fillStyle = '#80ffe8';
+    ctx.fillText('DIRECTOR STATE: ' + director.label.toUpperCase(), cx, cy + 98);
+    ctx.fillStyle = '#ffd86a';
+    ctx.fillText('BUILD FOCUS BY PLAYING CLOSE, CHAINING KILLS, AND GRABBING PICKUPS', cx, cy + 120);
 
     // Pulse prompt
-    var p = 0.55 + Math.sin(performance.now() * 0.005) * 0.45;
-    ctx.globalAlpha = p;
+    ctx.globalAlpha = pulse;
     ctx.shadowBlur = 14; ctx.shadowColor = '#ffd86a';
     ctx.fillStyle = '#ffd86a';
     ctx.font = 'bold 18px "SF Mono", monospace';
-    ctx.fillText('PRESS FIRE, THRUST, OR TAP TO ENGAGE', cx, cy + 132);
+    ctx.fillText('PRESS FIRE, THRUST, OR TAP TO ENGAGE', cx, cy + 158);
     ctx.globalAlpha = 1; ctx.shadowBlur = 0;
 
     if (best > 0) {
       ctx.font = '12px "SF Mono", monospace';
       ctx.fillStyle = '#fd8';
-      ctx.fillText('BEST  ' + best, cx, cy + 160);
+      ctx.fillText('BEST  ' + best, cx, cy + 182);
     }
     ctx.restore();
   }
