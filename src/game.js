@@ -270,7 +270,14 @@
     var gain = Math.floor(v * mult);
     score += gain;
     if (score > best) { best = score; saveBest(); }
-    floats.push({ x: x, y: y, t: 0, text: '+' + gain, color: color || '#fff' });
+    floats.push({
+      x: x,
+      y: y,
+      t: 0,
+      text: '+' + gain,
+      color: color || '#fff',
+      scale: gain >= 500 ? 1.25 : gain >= 100 ? 1.1 : 1
+    });
     combo++; comboT = 2.5;
     updateDirector();
   }
@@ -525,8 +532,8 @@
 
     // Floats
     for (var ft = floats.length - 1; ft >= 0; ft--) {
-      var f = floats[ft]; f.t += dt; f.y -= 30 * dt;
-      if (f.t > 0.8) floats.splice(ft, 1);
+      var f = floats[ft]; f.t += dt; f.y -= 24 * dt;
+      if (f.t > 1.05) floats.splice(ft, 1);
     }
 
     if (comboT > 0) comboT -= dt; else combo = 0;
@@ -604,12 +611,16 @@
     }
     ctx.globalAlpha = 1; ctx.shadowBlur = 0;
 
-    ctx.font = 'bold 13px "SF Mono", monospace';
     ctx.textAlign = 'center';
     for (var ft = 0; ft < floats.length; ft++) {
-      var f = floats[ft], al = 1 - f.t / 0.8;
-      ctx.globalAlpha = al; ctx.fillStyle = f.color;
-      ctx.shadowBlur = 6; ctx.shadowColor = f.color;
+      var f = floats[ft], al = 1 - f.t / 1.05;
+      ctx.globalAlpha = al;
+      ctx.font = 'bold ' + Math.floor(16 * (f.scale || 1)) + 'px "SF Mono", monospace';
+      var tw = ctx.measureText(f.text).width;
+      ctx.fillStyle = 'rgba(7,18,31,0.72)';
+      ctx.fillRect(f.x - tw * 0.5 - 14, f.y - 16, tw + 28, 24);
+      ctx.fillStyle = f.color;
+      ctx.shadowBlur = 10; ctx.shadowColor = f.color;
       ctx.fillText(f.text, f.x, f.y);
     }
     ctx.globalAlpha = 1; ctx.shadowBlur = 0;
@@ -965,7 +976,7 @@
     ctx.fillText('ASTEROIDS', leftX, leftY + 62);
     ctx.fillStyle = '#9cdfff';
     ctx.font = compact ? 'bold 20px "SF Mono", monospace' : 'bold 24px "SF Mono", monospace';
-    ctx.fillText('REWRITTEN TO HIT HARDER', leftX, leftY + 100);
+    ctx.fillText('ADAPTIVE COMBAT BUILD', leftX, leftY + 100);
 
     ctx.shadowBlur = 0;
     ctx.fillStyle = 'rgba(214, 232, 244, 0.88)';
@@ -973,12 +984,12 @@
     var blurb = compact
       ? [
         'Adaptive waves, close-range focus building, and short',
-        'overdrive spikes. Cleaner, meaner, and more deliberate',
-        'than the Claude build.'
+        'overdrive spikes. Cleaner, sharper, and more deliberate',
+        'from the first launch.'
       ]
       : [
         'Adaptive waves, close-range focus building, and short overdrive spikes.',
-        'Built to feel cleaner, meaner, and more authored than the Claude build.'
+        'Built to feel sharper, cleaner, and more deliberate from the first launch.'
       ];
     for (var b = 0; b < blurb.length; b++) ctx.fillText(blurb[b], leftX, leftY + 148 + b * 24);
 
