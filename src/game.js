@@ -924,16 +924,16 @@
     var cx = W / 2, cy = H / 2;
     var pulse = 0.55 + Math.sin(performance.now() * 0.005) * 0.45;
     var compact = W < 920;
-    var shellW = compact ? Math.min(W - 36, 620) : Math.min(W - 64, 1080);
-    var shellH = compact ? Math.min(H - 100, 540) : Math.min(H - 100, 520);
+    var shellW = compact ? Math.min(W - 36, 620) : Math.min(W - 64, 1100);
+    var shellH = compact ? Math.min(H - 100, 560) : Math.min(H - 120, 620);
     var shellX = cx - shellW / 2;
     var shellY = cy - shellH / 2;
-    var leftW = compact ? shellW - 48 : shellW * 0.54;
-    var rightW = compact ? shellW - 48 : shellW * 0.32;
+    var leftW = compact ? shellW - 48 : shellW * 0.5;
+    var rightW = compact ? shellW - 48 : shellW * 0.34;
     var leftX = shellX + 26;
     var leftY = shellY + 28;
     var rightX = compact ? shellX + 26 : shellX + shellW - rightW - 26;
-    var rightY = compact ? shellY + 268 : shellY + 34;
+    var rightY = compact ? shellY + 350 : shellY + 34;
 
     var wash = ctx.createRadialGradient(cx, cy, 40, cx, cy, shellW * 0.7);
     wash.addColorStop(0, 'rgba(31, 122, 184, 0.12)');
@@ -965,7 +965,7 @@
     ctx.fillText('ASTEROIDS', leftX, leftY + 62);
     ctx.fillStyle = '#9cdfff';
     ctx.font = compact ? 'bold 20px "SF Mono", monospace' : 'bold 24px "SF Mono", monospace';
-    ctx.fillText('REWRITTEN TO HIT HARDER', leftX, leftY + 96);
+    ctx.fillText('REWRITTEN TO HIT HARDER', leftX, leftY + 100);
 
     ctx.shadowBlur = 0;
     ctx.fillStyle = 'rgba(214, 232, 244, 0.88)';
@@ -973,17 +973,17 @@
     var blurb = compact
       ? [
         'Adaptive waves, close-range focus building, and short',
-        'overdrive spikes. This version should feel meaner, cleaner,',
-        'and more deliberate than the Claude build.'
+        'overdrive spikes. Cleaner, meaner, and more deliberate',
+        'than the Claude build.'
       ]
       : [
         'Adaptive waves, close-range focus building, and short overdrive spikes.',
-        'Built to feel meaner, cleaner, and more authored than the Claude build.'
+        'Built to feel cleaner, meaner, and more authored than the Claude build.'
       ];
-    for (var b = 0; b < blurb.length; b++) ctx.fillText(blurb[b], leftX, leftY + 142 + b * 24);
+    for (var b = 0; b < blurb.length; b++) ctx.fillText(blurb[b], leftX, leftY + 148 + b * 24);
 
-    var statY = leftY + (compact ? 238 : 220);
-    var statW = compact ? shellW - 84 : Math.min(164, (leftW - 18) / 3);
+    var statY = leftY + (compact ? 252 : 232);
+    var statW = compact ? shellW - 84 : Math.min(156, (leftW - 18) / 3);
     if (compact) {
       drawMenuStat(leftX, statY, statW, 50, 'DIRECTOR', director.label.toUpperCase(), '#ffcf74');
       drawMenuStat(leftX, statY + 58, statW, 50, 'OVERDRIVE', 'FOCUS-TRIGGERED', '#80ffe8');
@@ -994,22 +994,26 @@
       drawMenuStat(leftX + (statW + 10) * 2, statY, statW, 50, 'DEPLOYMENT', 'PAGES READY', '#7ef');
     }
 
-    var chipY = statY + (compact ? 190 : 76);
+    var chipY = statY + (compact ? 190 : 84);
     ctx.fillStyle = 'rgba(130, 230, 255, 0.18)';
-    roundRect(leftX, chipY, compact ? shellW - 84 : leftW - 20, compact ? 126 : 110, 18);
+    roundRect(leftX, chipY, compact ? shellW - 84 : leftW - 20, compact ? 126 : 138, 18);
     ctx.fill();
     ctx.strokeStyle = 'rgba(108,243,255,0.22)';
     ctx.stroke();
 
     ctx.fillStyle = '#80ffe8';
     ctx.font = 'bold 12px "SF Mono", monospace';
-    ctx.fillText('FLIGHT SYSTEMS', leftX + 16, chipY + 18);
+    ctx.fillText('FLIGHT SYSTEMS', leftX + 16, chipY + 20);
     ctx.fillStyle = '#d8edf8';
     ctx.font = compact ? '13px "SF Mono", monospace' : '14px "SF Mono", monospace';
     var controlLines = compact
       ? [
-        'TURN  A/D OR ARROWS   FIRE  SPACE   BOOST  ENTER',
-        'THRUST  W OR UP       WARP  SHIFT   PAUSE  P/ESC'
+        'TURN  A/D OR ARROWS',
+        'THRUST  W OR UP',
+        'FIRE  SPACE',
+        'BOOST  ENTER',
+        'WARP  SHIFT',
+        'PAUSE  P/ESC'
       ]
       : [
         'TURN  A/D OR ARROWS',
@@ -1020,16 +1024,16 @@
         'PAUSE  P/ESC'
       ];
     for (var cl = 0; cl < controlLines.length; cl++) {
-      var row = compact ? 0 : Math.floor(cl / 3);
-      var col = compact ? cl : cl % 3;
-      var tx = leftX + 16 + (compact ? 0 : col * 155);
-      var ty = chipY + 44 + (compact ? cl * 24 : row * 28);
+      var row = Math.floor(cl / 3);
+      var col = cl % 3;
+      var tx = compact ? leftX + 16 : leftX + 16 + col * 155;
+      var ty = compact ? chipY + 48 + cl * 18 : chipY + 48 + row * 34;
       ctx.fillText(controlLines[cl], tx, ty);
     }
 
     if (!compact) {
       var previewCx = rightX + rightW * 0.5;
-      var previewCy = rightY + 122;
+      var previewCy = rightY + 130;
       ctx.save();
       ctx.strokeStyle = 'rgba(108,243,255,0.14)';
       ctx.lineWidth = 1;
@@ -1049,21 +1053,26 @@
       }
 
       ctx.fillStyle = 'rgba(130, 230, 255, 0.16)';
-      roundRect(rightX, shellY + shellH - 168, rightW, 132, 22);
+      roundRect(rightX, shellY + shellH - 176, rightW, 140, 22);
       ctx.fill();
       ctx.strokeStyle = 'rgba(108,243,255,0.2)';
       ctx.stroke();
       ctx.fillStyle = '#7ef';
       ctx.font = 'bold 12px "SF Mono", monospace';
-      ctx.fillText('WHY THIS VERSION STANDS OUT', rightX + 16, shellY + shellH - 146);
+      ctx.fillText('WHY THIS VERSION STANDS OUT', rightX + 16, shellY + shellH - 152);
       ctx.fillStyle = '#d8edf8';
       ctx.font = '14px "SF Mono", monospace';
-      ctx.fillText('Fewer words. Stronger silhouette. Clear system identity.', rightX + 16, shellY + shellH - 114);
-      ctx.fillText('The menu now sells speed, threat, and intent before launch.', rightX + 16, shellY + shellH - 88);
+      ctx.fillText('Cleaner hierarchy. Stronger silhouette. Less filler.', rightX + 16, shellY + shellH - 118);
+      ctx.fillText('The menu now sells speed, threat, and intent before launch.', rightX + 16, shellY + shellH - 90);
       ctx.fillText('That is the right direction if the goal is to beat Claude.', rightX + 16, shellY + shellH - 62);
     }
 
     ctx.textAlign = compact ? 'left' : 'center';
+    if (!compact && best > 0) {
+      ctx.fillStyle = '#fd8';
+      ctx.font = 'bold 12px "SF Mono", monospace';
+      ctx.fillText('BEST  ' + best, cx, shellY + shellH - 62);
+    }
     ctx.globalAlpha = pulse;
     ctx.shadowBlur = 18;
     ctx.shadowColor = '#ffd86a';
@@ -1073,7 +1082,7 @@
     ctx.globalAlpha = 1;
     ctx.shadowBlur = 0;
 
-    if (best > 0) {
+    if (compact && best > 0) {
       ctx.fillStyle = '#fd8';
       ctx.font = 'bold 12px "SF Mono", monospace';
       ctx.fillText('BEST  ' + best, compact ? leftX : cx, shellY + shellH - 48);
