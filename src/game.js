@@ -996,7 +996,7 @@
 
     var chipY = statY + (compact ? 190 : 84);
     ctx.fillStyle = 'rgba(130, 230, 255, 0.18)';
-    roundRect(leftX, chipY, compact ? shellW - 84 : leftW - 20, compact ? 126 : 138, 18);
+    roundRect(leftX, chipY, compact ? shellW - 84 : leftW - 20, compact ? 126 : 156, 18);
     ctx.fill();
     ctx.strokeStyle = 'rgba(108,243,255,0.22)';
     ctx.stroke();
@@ -1024,10 +1024,10 @@
         'PAUSE  P/ESC'
       ];
     for (var cl = 0; cl < controlLines.length; cl++) {
-      var row = Math.floor(cl / 3);
-      var col = cl % 3;
-      var tx = compact ? leftX + 16 : leftX + 16 + col * 155;
-      var ty = compact ? chipY + 48 + cl * 18 : chipY + 48 + row * 34;
+      var row = compact ? cl : Math.floor(cl / 2);
+      var col = compact ? 0 : cl % 2;
+      var tx = compact ? leftX + 16 : leftX + 16 + col * 305;
+      var ty = compact ? chipY + 48 + cl * 18 : chipY + 50 + row * 34;
       ctx.fillText(controlLines[cl], tx, ty);
     }
 
@@ -1069,7 +1069,7 @@
 
     ctx.textAlign = 'left';
     var footerX = compact ? leftX : leftX;
-    var footerPromptY = shellY + shellH - (compact ? 28 : 40);
+    var footerPromptY = shellY + shellH - (compact ? 40 : 54);
     var footerBestY = footerPromptY - 34;
     if (best > 0) {
       ctx.fillStyle = '#fd8';
