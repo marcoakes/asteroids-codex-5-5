@@ -1052,19 +1052,6 @@
         drawMenuShard(rx, ry, ang, 0.75 - deco * 0.12);
       }
 
-      ctx.fillStyle = 'rgba(130, 230, 255, 0.16)';
-      roundRect(rightX, shellY + shellH - 176, rightW, 140, 22);
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(108,243,255,0.2)';
-      ctx.stroke();
-      ctx.fillStyle = '#7ef';
-      ctx.font = 'bold 12px "SF Mono", monospace';
-      ctx.fillText('WHY THIS VERSION STANDS OUT', rightX + 16, shellY + shellH - 152);
-      ctx.fillStyle = '#d8edf8';
-      ctx.font = '14px "SF Mono", monospace';
-      ctx.fillText('Cleaner hierarchy. Stronger silhouette. Less filler.', rightX + 16, shellY + shellH - 118);
-      ctx.fillText('The menu now sells speed, threat, and intent before launch.', rightX + 16, shellY + shellH - 90);
-      ctx.fillText('That is the right direction if the goal is to beat Claude.', rightX + 16, shellY + shellH - 62);
     }
 
     ctx.textAlign = 'left';
